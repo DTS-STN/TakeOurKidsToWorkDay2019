@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node DiscordBots/**/index.js",
     "yoda": "node DiscordBots/YodaBot/index.js",
+    "music": "node DiscordBots/MusicBot/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,8 +20,11 @@
   },
   "homepage": "https://github.com/MTS-STM/TakeOurKidsToWorkDay2019#readme",
   "dependencies": {
-    "axios": "^0.19.0",
     "discord.js": "^11.5.1",
-    "dotenv": "^8.2.0"
+    "dotenv": "^8.2.0",
+    "ffmpeg": "0.0.4",
+    "ffmpeg-binaries": "^4.0.0",
+    "opusscript": "0.0.7",
+    "ytdl-core": "^1.0.0"
   }
 }
