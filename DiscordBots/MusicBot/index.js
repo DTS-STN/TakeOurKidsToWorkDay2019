@@ -2,7 +2,7 @@ const Discord = require("discord.js");
 const ytdl = require("ytdl-core");
 require("dotenv").config();
 
-const token = process.env.MUSIC_BOT_TOKEN || "";
+const token = process.env.MUSIC_BOT_TOKEN || "notoken";
 
 const client = new Discord.Client();
 const queue = new Map();
@@ -128,5 +128,3 @@ function play(guild, song) {
     });
   dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
 }
-
-client.login(token);
