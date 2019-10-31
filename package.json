@@ -4,9 +4,14 @@
   "description": "This is the REPO for any work being done for the Take Our Kids To Work Day 2019",
   "main": "index.js",
   "scripts": {
-    "start": "node DiscordBots/**/index.js",
-    "yoda": "node DiscordBots/YodaBot/index.js",
-    "music": "node DiscordBots/MusicBot/index.js",
+    "start": "run-p bot:*",
+    "bot:yoda": "node DiscordBots/YodaBot/index.js",
+    "bot:music": "node DiscordBots/MusicBot/index.js",
+    "bot:marvel": "node DiscordBots/MarvelBot/index.js",
+    "bot:meme": "node DiscordBots/MemeBot/index.js",
+    "bot:octranspo": "node DiscordBots/OCTranspoBot/index.js",
+    "bot:rps": "node DiscordBots/RPSBot/index.js",
+    "bot:trivia": "node DiscordBots/TriviaBot/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,10 +25,12 @@
   },
   "homepage": "https://github.com/MTS-STM/TakeOurKidsToWorkDay2019#readme",
   "dependencies": {
+    "axios": "^0.19.0",
     "discord.js": "^11.5.1",
     "dotenv": "^8.2.0",
     "ffmpeg": "0.0.4",
     "ffmpeg-binaries": "^4.0.0",
+    "npm-run-all": "^4.1.5",
     "opusscript": "0.0.7",
     "ytdl-core": "^1.0.0"
   }

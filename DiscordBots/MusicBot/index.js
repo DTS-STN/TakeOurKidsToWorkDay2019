@@ -7,14 +7,14 @@ const token = process.env.MUSIC_BOT_TOKEN || "notoken";
 const client = new Discord.Client();
 const queue = new Map();
 
-client.once("ready", () => {
-  console.log("Ready!");
+client.on("ready", () => {
+  console.log(`Logged in as ${client.user.tag}!`);
 });
-client.once("reconnecting", () => {
-  console.log("Reconnecting!");
+client.on("reconnecting", () => {
+  console.log(`${client.user.tag} is reconnecting`);
 });
-client.once("disconnect", () => {
-  console.log("Disconnect!");
+client.on("disconnect", () => {
+  console.log(`${client.user} is disconnected`);
 });
 
 client.on("message", async message => {
