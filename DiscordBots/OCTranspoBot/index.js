@@ -1,6 +1,7 @@
 const Discord = require("discord.js");
 const client = new Discord.Client();
 const axios = require("axios");
+const en = require("./en.json");
 require("dotenv").config();
 
 // API key should be tokenized for security purposes
@@ -35,12 +36,42 @@ function getRoutesByStop(stopNumber) {
 
 // Message event handler
 client.on("message", msg => {
+  const collector = new Discord.MessageCollector(
+    msg.channel,
+    m => m.author.id === msg.author.id,
+    { time: 10000 }
+  );
   // Ignore message from self
   if (msg.author.bot) return;
   if (msg.content.startsWith("!OC")) {
-    getRoutesByStop("3037").then(data => {
-      console.log("API returned: " + data);
-      msg.reply(data.GetRouteSummaryForStopResult.StopDescription);
+    msg.reply(en.menu);
+
+    // Handle the users response
+    collector.once("collect", message => {
+      const choice = parseInt(message.content);
+      switch (choice) {
+        case 1:
+          message.channel.send("enter a valid stop number");
+          collector.once("collect", message => {
+            getRoutesByStop(message.content).then(response => {
+              message.channel.send(
+                JSON.stringify(
+                  response.GetRouteSummaryForStopResult.Routes.Route
+                ).substring(0, 1999)
+              );
+            });
+          });
+          break;
+        case 2:
+          message.channel.send("enter a valid stop number");
+          collector.once("collect", message => {});
+          break;
+        default:
+          message.channel.send(
+            `Sorry, "${message.content}" is not a valid option`
+          );
+          break;
+      }
     });
   }
 });
