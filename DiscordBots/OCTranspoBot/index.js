@@ -1,13 +1,11 @@
 const Discord = require("discord.js");
 const client = new Discord.Client();
-const axios = require("axios");
 const en = require("./en.json");
+const ocService = require("./ocService");
 require("dotenv").config();
 
 // API key should be tokenized for security purposes
 const token = process.env.OCTRANSPO_TOKEN || "";
-const appId = "0593fb82";
-const apiKey = "bff5a13a6823320bbe487c96d71483f5";
 
 // Connection event handlers with logging
 client.on("ready", () => {
@@ -20,18 +18,34 @@ client.on("disconnect", () => {
   console.log(`${client.user.tag} is disconnected`);
 });
 
-function getRoutesByStop(stopNumber) {
-  return axios
-    .get(
-      `https://api.octranspo1.com/v1.3/GetRouteSummaryForStop?appID=${appId}&apiKey=${apiKey}&stopNo=${stopNumber}&format=JSON`
-    )
-    .then(response => {
-      console.log(response.data);
-      return response.data;
-    })
-    .catch(err => {
-      console.log(err);
+function prettyPrintStopInfo(stopInfo) {
+  return `Route ${stopInfo.RouteNo} going to ${stopInfo.RouteHeading}`;
+}
+
+function prettyPrintTrips(trip) {
+  let tripInfo = `${trip.RouteNo} - ${trip.RouteLabel} \n`;
+  if (typeof trip.Trips.Trip !== "undefined") {
+    trip.Trips.Trip.forEach(trip => {
+      console.log(trip);
+      tripInfo += `   Destination: ${trip.TripDestination} arriving at ${trip.TripStartTime} \n`;
     });
+  } else {
+    tripInfo += `   no outgoing trips for this route\n`;
+  }
+  return tripInfo + "\n";
+}
+
+function prettyPrintTripsAllRoutes(trip) {
+  let tripInfo = `  **RouteNo:** ${trip.RouteNo}\n`;
+  if (typeof trip.Trips !== "undefined" && trip.Trips.length > 0) {
+    trip.Trips.forEach(trip => {
+      console.log(trip);
+      tripInfo += `    **Destination:** ${trip.TripDestination} **arriving at** ${trip.TripStartTime} \n`;
+    });
+  } else {
+    tripInfo += `    no outgoing trips for this route\n`;
+  }
+  return tripInfo;
 }
 
 // Message event handler
@@ -44,28 +58,49 @@ client.on("message", msg => {
   // Ignore message from self
   if (msg.author.bot) return;
   if (msg.content.startsWith("!OC")) {
+    // Print the paths for this bot
     msg.reply(en.menu);
-
     // Handle the users response
     collector.once("collect", message => {
       const choice = parseInt(message.content);
       switch (choice) {
+        // List routes that stop at TDLC
         case 1:
-          message.channel.send("enter a valid stop number");
-          collector.once("collect", message => {
-            getRoutesByStop(message.content).then(response => {
-              message.channel.send(
-                JSON.stringify(
-                  response.GetRouteSummaryForStopResult.Routes.Route
-                ).substring(0, 1999)
-              );
+          ocService.getRoutesByStop(5718).then(response => {
+            let stopList = "";
+            response.forEach(stop => {
+              stopList += prettyPrintStopInfo(stop) + "\n";
             });
+            message.channel.send(stopList);
           });
           break;
         case 2:
-          message.channel.send("enter a valid stop number");
-          collector.once("collect", message => {});
+          message.channel.send("Which route?");
+          collector.once("collect", message => {
+            ocService
+              .getDeparturesByStop(5718, message.content)
+              .then(response => {
+                let tripList = "";
+                response.forEach(trip => {
+                  tripList += prettyPrintTrips(trip);
+                });
+                message.channel.send(tripList + "\n");
+              });
+          });
           break;
+        case 3:
+          message.channel.send("Which stop?");
+          collector.once("collect", message => {
+            ocService.getAllDeparturesByStop(message.content).then(response => {
+              let tripList = `**Stop number** ${response.StopNo}: ${response.StopDescription}\n`;
+              response.Routes.Route.forEach(trip => {
+                tripList += prettyPrintTripsAllRoutes(trip);
+              });
+              message.channel.send(tripList + "\n");
+            });
+          });
+          break;
+
         default:
           message.channel.send(
             `Sorry, "${message.content}" is not a valid option`
