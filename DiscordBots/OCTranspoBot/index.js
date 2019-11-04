@@ -10,8 +10,9 @@ const token = process.env.OCTRANSPO_TOKEN || "";
 
 // Connection event handlers with logging
 client.on("ready", () => {
-  client.user.setStatus("available", "Type !OC to start");
-  client.user.setActivity("Type !OC to start", { type: "WATCHING" });
+  client.user.setActivity("Type / Tapez !OC", {
+    type: "PLAYING"
+  });
   console.log(`Logged in as ${client.user.tag}!`);
 });
 client.on("reconnecting", () => {
@@ -21,32 +22,30 @@ client.on("disconnect", () => {
   console.log(`${client.user.tag} is disconnected`);
 });
 
-function prettyPrintStopInfo(stopInfo) {
-  return `Route ${stopInfo.RouteNo} going to ${stopInfo.RouteHeading}`;
+function prettyPrintStopInfo(stopInfo, language) {
+  return `**${language.route}:** ${stopInfo.RouteNo} **${language.goingTo}:** ${stopInfo.RouteHeading}`;
 }
 
-function prettyPrintTrips(trip) {
+function prettyPrintTrips(trip, language) {
   let tripInfo = `${trip.RouteNo} - ${trip.RouteLabel} \n`;
   if (typeof trip.Trips.Trip !== "undefined") {
     trip.Trips.Trip.forEach(trip => {
-      console.log(trip);
-      tripInfo += `   Destination: ${trip.TripDestination} arriving at ${trip.TripStartTime} \n`;
+      tripInfo += `   **${language.destination}:** ${trip.TripDestination} **${language.arrivingAt}** ${trip.TripStartTime} \n`;
     });
   } else {
-    tripInfo += `   no outgoing trips for this route\n`;
+    tripInfo += `   *${language.noOutgoing}*\n`;
   }
   return tripInfo + "\n";
 }
 
-function prettyPrintTripsAllRoutes(trip) {
-  let tripInfo = `  **RouteNo:** ${trip.RouteNo}\n`;
+function prettyPrintTripsAllRoutes(trip, language) {
+  let tripInfo = `  **${language.route}:** ${trip.RouteNo}\n`;
   if (typeof trip.Trips !== "undefined" && trip.Trips.length > 0) {
     trip.Trips.forEach(trip => {
-      console.log(trip);
-      tripInfo += `    **Destination:** ${trip.TripDestination} **arriving at** ${trip.TripStartTime} \n`;
+      tripInfo += `    **${language.destination}:** ${trip.TripDestination} **${language.arrivingAt}** ${trip.TripStartTime} \n`;
     });
   } else {
-    tripInfo += `    no outgoing trips for this route\n`;
+    tripInfo += `    *${language.noOutgoing}*\n`;
   }
   return tripInfo;
 }
@@ -62,7 +61,7 @@ client.on("message", msg => {
     const collector = new Discord.MessageCollector(
       msg.channel,
       m => m.author.id === msg.author.id,
-      { time: 10000 }
+      { time: 50000 }
     );
     collector.once("collect", languageChoice => {
       switch (languageChoice.content.toLocaleLowerCase()) {
@@ -90,43 +89,58 @@ client.on("message", msg => {
             ocService.getRoutesByStop(5718).then(response => {
               let stopList = "";
               response.forEach(stop => {
-                stopList += prettyPrintStopInfo(stop) + "\n";
+                stopList += prettyPrintStopInfo(stop, language) + "\n";
               });
               message.channel.send(stopList);
             });
             break;
           case 2:
-            message.channel.send("Which route?");
+            message.channel.send(`${language.whichRoute}?`);
             collector.once("collect", message => {
               ocService
                 .getDeparturesByStop(5718, message.content)
                 .then(response => {
                   let tripList = "";
-                  response.forEach(trip => {
-                    tripList += prettyPrintTrips(trip);
-                  });
+                  if (Array.isArray(response)) {
+                    response.forEach(trip => {
+                      tripList += prettyPrintTrips(trip, language);
+                    });
+                  } else {
+                    tripList += language.noOutgoing;
+                  }
                   message.channel.send(tripList + "\n");
+                })
+                .catch(err => {
+                  message.channel.send(err.message);
                 });
             });
             break;
           case 3:
-            message.channel.send("Which stop?");
+            message.channel.send(`${language.whichStop}?`);
             collector.once("collect", message => {
               ocService
                 .getAllDeparturesByStop(message.content)
                 .then(response => {
-                  let tripList = `**Stop number** ${response.StopNo}: ${response.StopDescription}\n`;
-                  response.Routes.Route.forEach(trip => {
-                    tripList += prettyPrintTripsAllRoutes(trip);
-                  });
+                  let tripList = `**${language.stopNumber}** ${response.StopNo}: ${response.StopDescription}\n`;
+                  if (Array.isArray(response.Routes.Route)) {
+                    response.Routes.Route.forEach(trip => {
+                      tripList += prettyPrintTripsAllRoutes(trip, language);
+                    });
+                  } else {
+                    tripList += `${language.noOutgoingStop}`;
+                  }
                   message.channel.send(tripList + "\n");
+                })
+                .catch(err => {
+                  console.log(err.message);
+                  message.channel.send(language.noOutgoingStop);
                 });
             });
             break;
 
           default:
             message.channel.send(
-              `Sorry, "${message.content}" is not a valid option`
+              `${language.sorry}, "${message.content}" ${language.notValid}`
             );
             break;
         }
