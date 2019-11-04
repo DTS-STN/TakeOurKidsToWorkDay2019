@@ -10,6 +10,8 @@ const token = process.env.OCTRANSPO_TOKEN || "";
 
 // Connection event handlers with logging
 client.on("ready", () => {
+  client.user.setStatus("available", "Type !OC to start");
+  client.user.setActivity("Type !OC to start", { type: "WATCHING" });
   console.log(`Logged in as ${client.user.tag}!`);
 });
 client.on("reconnecting", () => {
