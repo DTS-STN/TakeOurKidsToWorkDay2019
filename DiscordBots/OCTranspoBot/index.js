@@ -51,33 +51,34 @@ function prettyPrintTripsAllRoutes(trip) {
 
 // Message event handler
 client.on("message", msg => {
-  const collector = new Discord.MessageCollector(
-    msg.channel,
-    m => m.author.id === msg.author.id,
-    { time: 10000 }
-  );
   // Ignore message from self
   if (msg.author.bot) return;
+  // The message was intended for this bot
   if (msg.content.startsWith("!OC")) {
     let language;
     msg.reply("Chose your language: / Choisissez votre langue: (en / fr)");
+    const collector = new Discord.MessageCollector(
+      msg.channel,
+      m => m.author.id === msg.author.id,
+      { time: 10000 }
+    );
     collector.once("collect", languageChoice => {
-      // Print the paths for this bot
-      while (typeof language === "undefined") {
-        switch (languageChoice.content.toLocaleLowerCase()) {
-          case "en":
-            language = en;
-            break;
+      switch (languageChoice.content.toLocaleLowerCase()) {
+        case "en":
+          language = en;
+          break;
 
-          case "fr":
-            language = fr;
-            break;
+        case "fr":
+          language = fr;
+          break;
 
-          default:
-            languageChoice.reply("Invalid language / Langue invalide");
-            break;
-        }
+        default:
+          languageChoice.reply(
+            "Invalid language, type !OC to try again / Langue non valide, tapez !OC pour réessayer"
+          );
+          return;
       }
+      languageChoice.reply(language.menu);
       // Handle the users response
       collector.once("collect", message => {
         const choice = parseInt(message.content);
