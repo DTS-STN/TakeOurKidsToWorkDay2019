@@ -1,5 +1,5 @@
 {
-  "menu": "What would you like to do? (enter 1-3).\n1. Get a list of routes that are departing soon from Terrasse de la Chaudiere. \n2. Get the next 3 departures for a route at Terrasse de la Chaudiere.\n3. Get a list of all route departures from a given stop",
+  "menu": "What would you like to do? (enter 1-3).\n1. Get a list of routes that are departing soon from Terrasse de la Chaudiere. \n2. Get the next 3 departures for a route at Terrasse de la Chaudiere.\n3. Get a list of all route departures from a given stop\n4. Get a list of routes that are departing soon from a given stop\n5. Get the next 3 departures for a given route ata given stop",
   "route": "Route",
   "goingTo": "going to",
   "destination": "Destination",

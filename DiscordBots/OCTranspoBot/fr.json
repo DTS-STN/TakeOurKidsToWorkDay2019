@@ -1,5 +1,5 @@
 {
-  "menu": "Qu'est-ce que vous vouler faire? (entrez 1-3).\n1. Obtenez une liste de lignes qui partent bientôt de Terrasse de la Chaudière. \n2. Obtenez les 3 prochains départs de une ligne à partir de Terrasse de la Chaudière.\n3. Obtenir une liste de tous les départs de lignes à partir d'un arrêt donné",
+  "menu": "Qu'est-ce que vous vouler faire? (entrez 1-3).\n1. Obtenez une liste de lignes qui partent bientôt de Terrasse de la Chaudière. \n2. Obtenez les 3 prochains départs de une ligne à partir de Terrasse de la Chaudière.\n3. Obtenir une liste de tous les départs de lignes à partir d'un arrêt donné\n4. \n5. ",
   "route": "Ligne",
   "goingTo": "vers",
   "destination": "Destination",
