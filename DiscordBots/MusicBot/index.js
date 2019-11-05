@@ -1,8 +1,10 @@
 const Discord = require("discord.js");
 const ytdl = require("ytdl-core");
+const axios = require("axios");
 require("dotenv").config();
 
 const token = process.env.MUSIC_BOT_TOKEN || "notoken";
+const apiKey = process.env.YT_API || "";
 
 const client = new Discord.Client();
 const queue = new Map();
@@ -48,26 +50,28 @@ async function execute(message, serverQueue) {
     );
   }
 
-  let message = msg.content.substr(5).trim();
+  let query = message.content.substr(5).trim();
   let url = encodeURI(
-    `${process.env.YT_URL}?key=${apiKey}&part=snippet&q=${message}&topicId=${process.env.MUSIC_TOPIC}&type=video&safeSearch=strict`
+    `${process.env.YT_URL}?key=${apiKey}&part=snippet&q=${query}&topicId=${process.env.MUSIC_TOPIC}&type=video&safeSearch=strict`
   );
   let videoUrl;
-  axios.get(url).then(response => {
+  let songInfo;
+  let song;
+
+  await axios.get(url).then(async response => {
     if (response.data) {
       if (response.data.items) {
         let item = response.data.items[0];
-        console.log(item);
         videoUrl = `https://www.youtube.com/watch?v=${item.id.videoId}`;
+        songInfo = await ytdl.getInfo(videoUrl);
+        song = {
+          title: songInfo.title,
+          url: songInfo.video_url
+        };
+        console.log(song);
       }
     }
   });
-
-  const songInfo = await ytdl.getInfo(videoUrl);
-  const song = {
-    title: songInfo.title,
-    url: songInfo.video_url
-  };
 
   if (!serverQueue) {
     const queueContruct = {
@@ -84,6 +88,7 @@ async function execute(message, serverQueue) {
     queueContruct.songs.push(song);
 
     try {
+      console.log(queueContruct.songs);
       var connection = await voiceChannel.join();
       queueContruct.connection = connection;
       play(message.guild, queueContruct.songs[0]);
