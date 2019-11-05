@@ -8,10 +8,6 @@ require("dotenv").config();
 // API key should be tokenized for security purposes
 const token = process.env.OCTRANSPO_TOKEN || "";
 
-const feature1 = false;
-const feature2 = false;
-const feature3 = false;
-
 function prettyPrintStopInfo(stopInfo, language) {
   return `**${language.route}:** ${stopInfo.RouteNo} **${language.goingTo}:** ${stopInfo.RouteHeading}`;
 }
@@ -52,7 +48,7 @@ client.on("message", msg => {
       m => m.author.id === msg.author.id,
       { time: 50000 }
     );
-    msg.reply("Chose your language: / Choisissez votre langue: (en / fr)");
+    msg.reply("Chose your language: • Choisissez votre langue: (en / fr)");
     collector.once("collect", languageChoice => {
       switch (languageChoice.content.toLocaleLowerCase()) {
         case "en":
@@ -65,7 +61,7 @@ client.on("message", msg => {
 
         default:
           languageChoice.reply(
-            "Invalid language, type !OC to try again / Langue non valide, tapez !OC pour réessayer"
+            "Invalid language, type !OC to try again • Langue non valide, tapez !OC pour réessayer"
           );
           return;
       }
@@ -189,7 +185,7 @@ client.on("message", msg => {
 
 // Event handlers for connection state
 client.on("ready", () => {
-  client.user.setActivity("Type / Tapez !OC", {
+  client.user.setActivity("Type • Tapez !OC", {
     type: "PLAYING"
   });
   console.log(`Logged in as ${client.user.tag}!`);
