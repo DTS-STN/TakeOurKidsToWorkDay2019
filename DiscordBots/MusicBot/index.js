@@ -36,8 +36,6 @@ client.on("message", async message => {
 });
 
 async function execute(message, serverQueue) {
-  const args = message.content.split(" ");
-
   const voiceChannel = message.member.voiceChannel;
   if (!voiceChannel)
     return message.channel.send(
@@ -50,7 +48,22 @@ async function execute(message, serverQueue) {
     );
   }
 
-  const songInfo = await ytdl.getInfo(args[1]);
+  let message = msg.content.substr(5).trim();
+  let url = encodeURI(
+    `${process.env.YT_URL}?key=${apiKey}&part=snippet&q=${message}&topicId=${process.env.MUSIC_TOPIC}&type=video&safeSearch=strict`
+  );
+  let videoUrl;
+  axios.get(url).then(response => {
+    if (response.data) {
+      if (response.data.items) {
+        let item = response.data.items[0];
+        console.log(item);
+        videoUrl = `https://www.youtube.com/watch?v=${item.id.videoId}`;
+      }
+    }
+  });
+
+  const songInfo = await ytdl.getInfo(videoUrl);
   const song = {
     title: songInfo.title,
     url: songInfo.video_url
