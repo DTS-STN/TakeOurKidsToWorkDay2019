@@ -7,11 +7,11 @@
     "start": "run-p bot:*",
     "bot:yoda": "node DiscordBots/YodaBot/index.js",
     "bot:music": "node DiscordBots/MusicBot/index.js",
-    "bot:marvel": "node DiscordBots/MarvelBot/index.js",
-    "bot:meme": "node DiscordBots/MemeBot/index.js",
+    "marvel": "node DiscordBots/MarvelBot/index.js",
+    "meme": "node DiscordBots/MemeBot/index.js",
     "bot:octranspo": "node DiscordBots/OCTranspoBot/index.js",
     "bot:rps": "node DiscordBots/RPSBot/index.js",
-    "bot:trivia": "node DiscordBots/TriviaBot/index.js",
+    "trivia": "node DiscordBots/TriviaBot/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
