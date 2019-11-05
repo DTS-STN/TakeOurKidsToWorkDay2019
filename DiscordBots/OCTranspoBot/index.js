@@ -48,7 +48,7 @@ client.on("message", msg => {
       m => m.author.id === msg.author.id,
       { time: 50000 }
     );
-    msg.reply("Chose your language: • Choisissez votre langue: (en / fr)");
+    msg.reply("Choose your language: • Choisissez votre langue: (en / fr)");
     collector.once("collect", languageChoice => {
       switch (languageChoice.content.toLocaleLowerCase()) {
         case "en":
