@@ -20,7 +20,7 @@ client.on("disconnect", () => {
 // Message event handler
 client.on("message", msg => {
   // Ignore message from self
-  if (message.author.bot) return;
+  if (msg.author.bot) return;
   if (msg.content.startsWith("!Trivia")) {
   }
 });

@@ -1,0 +1,14 @@
+{
+  "menu": "What would you like to do? (enter 1-3).\n1. Get a list of routes that are departing soon from Terrasse de la Chaudiere. \n2. Get the next 3 departures for a route at Terrasse de la Chaudiere.\n3. Get a list of all route departures from a given stop\n4. Get a list of routes that are departing soon from a given stop\n5. Get the next 3 departures for a given route at a given stop",
+  "route": "Route",
+  "goingTo": "going to",
+  "destination": "Destination",
+  "arrivingAt": "departing at",
+  "noOutgoing": "no outgoing trips for this route",
+  "noOutgoingStop": "No outgoing trips for this stop",
+  "whichRoute": "Which route",
+  "whichStop": "Which stop",
+  "stopNumber": "Stop number",
+  "sorry": "Sorry",
+  "notValid": "is not a valid option"
+}

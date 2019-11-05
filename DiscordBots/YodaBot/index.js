@@ -17,6 +17,10 @@ client.on("message", msg => {
       .then(response => {
         console.log(response.data.yodish);
         msg.reply(response.data.yodish);
+      })
+      .catch(() => {
+        console.log(">:(");
+        msg.reply("Sorry, this doesn't work yet");
       });
   }
 });
