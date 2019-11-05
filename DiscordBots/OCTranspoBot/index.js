@@ -8,19 +8,9 @@ require("dotenv").config();
 // API key should be tokenized for security purposes
 const token = process.env.OCTRANSPO_TOKEN || "";
 
-// Connection event handlers with logging
-client.on("ready", () => {
-  client.user.setActivity("Type / Tapez !OC", {
-    type: "PLAYING"
-  });
-  console.log(`Logged in as ${client.user.tag}!`);
-});
-client.on("reconnecting", () => {
-  console.log(`${client.user.tag} is reconnecting`);
-});
-client.on("disconnect", () => {
-  console.log(`${client.user.tag} is disconnected`);
-});
+const feature1 = false;
+const feature2 = false;
+const feature3 = false;
 
 function prettyPrintStopInfo(stopInfo, language) {
   return `**${language.route}:** ${stopInfo.RouteNo} **${language.goingTo}:** ${stopInfo.RouteHeading}`;
@@ -56,13 +46,13 @@ client.on("message", msg => {
   if (msg.author.bot) return;
   // The message was intended for this bot
   if (msg.content.startsWith("!OC")) {
-    let language;
-    msg.reply("Chose your language: / Choisissez votre langue: (en / fr)");
+    let language = en;
     const collector = new Discord.MessageCollector(
       msg.channel,
       m => m.author.id === msg.author.id,
       { time: 50000 }
     );
+    msg.reply("Chose your language: / Choisissez votre langue: (en / fr)");
     collector.once("collect", languageChoice => {
       switch (languageChoice.content.toLocaleLowerCase()) {
         case "en":
@@ -84,7 +74,7 @@ client.on("message", msg => {
       collector.once("collect", message => {
         const choice = parseInt(message.content);
         switch (choice) {
-          // List routes that stop at TDLC
+          /** Route 1. get routes for TDLC **/
           case 1:
             ocService.getRoutesByStop(5718).then(response => {
               let stopList = "";
@@ -94,6 +84,8 @@ client.on("message", msg => {
               message.channel.send(stopList);
             });
             break;
+
+          /** Route 2. get next 3 departures for a route at TDLC **/
           case 2:
             message.channel.send(`${language.whichRoute}?`);
             collector.once("collect", message => {
@@ -115,6 +107,8 @@ client.on("message", msg => {
                 });
             });
             break;
+
+          /** Route 3. get next 3 departures for all routes at a stop **/
           case 3:
             message.channel.send(`${language.whichStop}?`);
             collector.once("collect", message => {
@@ -137,16 +131,75 @@ client.on("message", msg => {
                 });
             });
             break;
+          /** Get routes for any stop **/
+          case 4:
+            message.channel.send(`${language.whichStop}?`);
+            collector.once("collect", message => {
+              let stop = message.content;
+              ocService.getRoutesByStop(stop).then(response => {
+                let stopList = "";
+                response.forEach(stop => {
+                  stopList += prettyPrintStopInfo(stop, language) + "\n";
+                });
+                message.channel.send(stopList);
+              });
+            });
+            break;
+
+          /** 4. Get next 3 departures for any route at any stop **/
+          case 5:
+            // Ask for route number
+            message.channel.send(`${language.whichRoute}?`);
+            collector.once("collect", message => {
+              let route = message.content;
+              // Ask for stop number
+              message.channel.send(`${language.whichStop}?`);
+              collector.once("collect", message => {
+                let stop = message.content;
+                ocService
+                  .getDeparturesByStop(stop, route)
+                  .then(response => {
+                    let tripList = "";
+                    if (Array.isArray(response)) {
+                      response.forEach(trip => {
+                        tripList += prettyPrintTrips(trip, language);
+                      });
+                    } else {
+                      tripList += language.noOutgoing;
+                    }
+                    message.channel.send(tripList + "\n");
+                  })
+                  .catch(err => {
+                    message.channel.send(err.message);
+                  });
+              });
+            });
+            break;
 
           default:
             message.channel.send(
               `${language.sorry}, "${message.content}" ${language.notValid}`
             );
             break;
-        }
-      });
-    });
-  }
+        } //end switch
+      }); // end menu choice
+    }); // end languageChoice
+  } // end of bot accepted message
+}); // end of client recieving message event
+
+// Event handlers for connection state
+client.on("ready", () => {
+  client.user.setActivity("Type / Tapez !OC", {
+    type: "PLAYING"
+  });
+  console.log(`Logged in as ${client.user.tag}!`);
 });
+client.on("reconnecting", () => {
+  console.log(`${client.user.tag} is reconnecting`);
+});
+client.on("disconnect", () => {
+  console.log(`${client.user.tag} is disconnected`);
+});
+
 // Create connection to Discord API
 client.login(token);

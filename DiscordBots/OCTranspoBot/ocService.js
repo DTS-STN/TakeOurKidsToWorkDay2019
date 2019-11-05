@@ -1,7 +1,8 @@
 const axios = require("axios");
+require("dotenv").config();
 
-const appId = "0593fb82";
-const apiKey = "bff5a13a6823320bbe487c96d71483f5";
+const appId = process.env.OC_APP_ID || ""; //"0593fb82";
+const apiKey = process.env.OC_APP_KEY || ""; //"bff5a13a6823320bbe487c96d71483f5";
 
 function getRoutesByStop(stopNumber) {
   console.log("Calling in getRoutesByStop");
