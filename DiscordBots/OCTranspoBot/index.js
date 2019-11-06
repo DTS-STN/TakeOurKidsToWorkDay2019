@@ -36,6 +36,14 @@ function prettyPrintTripsAllRoutes(trip, language) {
   return tripInfo;
 }
 
+async function bulkDelete(channel) {
+  let fetched;
+  do {
+    fetched = await channel.fetchMessages({ limit: 100 });
+    channel.bulkDelete(fetched);
+  } while (fetched >= 2);
+}
+
 // Message event handler
 client.on("message", msg => {
   // Ignore message from self
@@ -170,6 +178,10 @@ client.on("message", msg => {
                   });
               });
             });
+            break;
+
+          case 6:
+            bulkDelete(message.channel);
             break;
 
           default:
